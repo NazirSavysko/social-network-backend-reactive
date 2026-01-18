@@ -21,7 +21,6 @@ public final class AuthController {
     public Mono<String> login(@Valid @RequestBody Mono<GetLoginDTO> loginDtoMono) {
         return loginDtoMono
                 .map(dto -> {
-                    // Ваша логика входа
                     return "Login successful";
                 });
     }
