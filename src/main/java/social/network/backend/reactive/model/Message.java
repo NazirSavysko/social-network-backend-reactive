@@ -1,14 +1,12 @@
 package social.network.backend.reactive.model;
 
-import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.SEQUENCE;
 
-@Entity
 @Table(name = "message")
 @Setter
 @Getter
@@ -17,16 +15,15 @@ import static jakarta.persistence.GenerationType.SEQUENCE;
 @Builder
 public final class Message {
     @Id
-    @GeneratedValue(strategy = SEQUENCE)
     private Integer id;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "sender_id", referencedColumnName = "id")
-    private User sender;
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "sender_id", referencedColumnName = "id")
+    private Integer senderId;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "recipient_id", referencedColumnName = "id")
-    private User recipient;
+//    @ManyToOne(fetch = LAZY)
+//    @JoinColumn(name = "recipient_id", referencedColumnName = "id")
+    private Integer recipientId;
 
     private LocalDateTime messageDate;
 

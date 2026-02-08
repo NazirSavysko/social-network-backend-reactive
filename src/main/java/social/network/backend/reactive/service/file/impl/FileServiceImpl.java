@@ -1,9 +1,9 @@
-package social.network.backend.reactive.service.impl;
+package social.network.backend.reactive.service.file.impl;
 
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import social.network.backend.reactive.service.FileService;
+import social.network.backend.reactive.service.file.FileService;
 
 import java.nio.file.Path;
 

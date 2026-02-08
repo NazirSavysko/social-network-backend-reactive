@@ -1,4 +1,4 @@
-package social.network.backend.reactive.service;
+package social.network.backend.reactive.service.file;
 
 import reactor.core.publisher.Mono;
 

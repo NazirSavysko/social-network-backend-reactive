@@ -1,24 +1,18 @@
 package social.network.backend.reactive.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.*;
-
-import static jakarta.persistence.GenerationType.SEQUENCE;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 
 @Getter
 @Setter
-@Entity
 @Table(name = "image")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public final class Image {
     @Id
-    @GeneratedValue(strategy = SEQUENCE)
     private Integer id;
 
     private String filePath;
