@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import social.network.backend.reactive.model.User;
 import social.network.backend.reactive.model.enums.Role;
 
@@ -14,12 +15,13 @@ public final class RegistrationServiceImpl implements RegistrationService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Mono<User> prepareUserForRegistration(final Mono<User> rawUser) {
-        return user -> {
-            user.setRole(Role.ROLE_USER);
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+    public Mono<User> prepareUserForRegistration(final User rawUser) {
 
-            return user;
-        });
+        return Mono.fromCallable(() -> {
+                    rawUser.setPassword(passwordEncoder.encode(rawUser.getPassword()));
+                    rawUser.setRole(Role.ROLE_USER);
+                    return rawUser;
+                })
+                .subscribeOn(Schedulers.boundedElastic()); // <--- "Кухня" (отдельные потоки)
     }
 }

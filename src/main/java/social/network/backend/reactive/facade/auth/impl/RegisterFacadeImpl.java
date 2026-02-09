@@ -8,7 +8,6 @@ import social.network.backend.reactive.facade.auth.RegisterFacade;
 import social.network.backend.reactive.mapper.auth.GetRegistrationMapper;
 import social.network.backend.reactive.service.auth.RegistrationService;
 import social.network.backend.reactive.service.user.UserWriteService;
-import social.network.backend.reactive.validator.MonoValidator;
 
 @Component
 @AllArgsConstructor
@@ -23,7 +22,6 @@ public final class RegisterFacadeImpl implements RegisterFacade {
         return registerFacadeDTO
                 .map(this.registrationMapper::mapToEntity)
                 .flatMap(this.registrationService::prepareUserForRegistration)
-                .flatMap(this.userWriteService::saveUser)
-                .then();
+                .flatMap(this.userWriteService::saveUser);
     }
 }
