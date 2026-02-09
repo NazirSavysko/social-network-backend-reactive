@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import social.network.backend.reactive.dto.GetLoginDTO;
 import social.network.backend.reactive.dto.auth.RegisterDTO;
 import social.network.backend.reactive.facade.auth.RegisterFacade;
+import social.network.backend.reactive.validator.MonoValidator;
 
 @RestController
 @AllArgsConstructor
@@ -19,6 +20,7 @@ import social.network.backend.reactive.facade.auth.RegisterFacade;
 public final class AuthController {
 
     private final RegisterFacade registerFacade;
+    private final MonoValidator monoValidator;
 //    private final LoginFacade loginFacade;
 
     @PostMapping("/login")
@@ -29,9 +31,11 @@ public final class AuthController {
                 });
     }
 
-    @PostMapping(value = "/registration",produces = MediaType.APPLICATION_NDJSON_VALUE)
-    public Mono<?> registration(final @Valid @RequestBody RegisterDTO registerDTO) {
+    @PostMapping(value = "/registration")
+    public Mono<?> registration(final @RequestBody Mono<RegisterDTO> registerDTO) {
 
-        return registerFacade.register(registerDTO);
+        return registerDTO
+                .transform(this.monoValidator::validate)
+                .as(this.registerFacade::register);
     }
 }

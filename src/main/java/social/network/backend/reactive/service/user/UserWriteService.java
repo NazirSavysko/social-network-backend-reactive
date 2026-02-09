@@ -6,7 +6,7 @@ import social.network.backend.reactive.model.User;
 public interface UserWriteService {
     Mono<Void> deleteUser(Integer id);
 
-    Mono<User> createUser(User user);
+    Mono<User> saveUser(User user);
 
     Mono<User> updateUser(Integer id,User user);
 }
