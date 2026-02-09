@@ -20,7 +20,9 @@ public final class UserWriteServiceImpl implements UserWriteService {
 
     @Override
     public Mono<Void> saveUser(final User user) {
-        return userRepository.save(user);
+        return userRepository
+                .save(user)
+                .then();
     }
 
     @Override
