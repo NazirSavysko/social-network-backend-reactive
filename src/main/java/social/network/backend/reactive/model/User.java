@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 
 
-@Table(name = "social_user")
+@Table(name = "SOCIAL_USER")
 @Setter
 @Getter
 @AllArgsConstructor
