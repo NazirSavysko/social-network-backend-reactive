@@ -29,7 +29,7 @@ public final class LoginFacadeImpl implements LoginFacade {
                             if (this.passwordEncoder.matches(dto.password(), user.getPassword())) {
                                 val token = this.jwtGeneratorService.generateToken(user);
 
-                                return Mono.just(new AuthResponseDTO(token, user.getRole().name()));
+                                return Mono.just(new AuthResponseDTO(token, user.getRole().name(),user.getId()));
                             }
 
                             return Mono.error(new BadCredentialsException("Wrong credentials"));
