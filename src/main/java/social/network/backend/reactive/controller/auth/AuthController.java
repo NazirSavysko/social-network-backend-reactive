@@ -28,7 +28,6 @@ public final class AuthController {
 
     @PostMapping("/login")
     public Mono<?> login(final @RequestBody Mono<GetLoginDTO> loginDtoMono) {
-        System.out.println(passwordEncoder.encode("Password123"));
         return loginDtoMono
                 .transform(this.monoValidator::validate)
                 .as(this.loginFacade::login);
