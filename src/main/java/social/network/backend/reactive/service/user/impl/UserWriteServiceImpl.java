@@ -1,6 +1,7 @@
 package social.network.backend.reactive.service.user.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import social.network.backend.reactive.model.User;
@@ -8,7 +9,7 @@ import social.network.backend.reactive.repository.user.UserRepository;
 import social.network.backend.reactive.service.user.UserWriteService;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public final class UserWriteServiceImpl implements UserWriteService {
 
     private final UserRepository userRepository;

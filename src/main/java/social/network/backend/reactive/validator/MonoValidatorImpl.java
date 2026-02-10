@@ -16,7 +16,6 @@ public class MonoValidatorImpl implements MonoValidator {
 
     public <T> Mono<T> validate(Mono<T> objectMono) {
         return objectMono
-                .doOnNext(System.out::println)
                 .flatMap(dto -> {
                     val errors = new BeanPropertyBindingResult(dto, dto.getClass().getName());
                     validator.validate(dto, errors);

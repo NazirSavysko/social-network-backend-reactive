@@ -5,4 +5,5 @@ import social.network.backend.reactive.model.User;
 
 public interface UserReadService {
     Mono<User> getUserById(Integer id);
+    Mono<User> getUserByEmail(String email);
 }

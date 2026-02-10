@@ -1,6 +1,7 @@
 package social.network.backend.reactive.service.auth;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -9,7 +10,7 @@ import social.network.backend.reactive.model.User;
 import social.network.backend.reactive.model.enums.Role;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public final class RegistrationServiceImpl implements RegistrationService {
 
     private final PasswordEncoder passwordEncoder;
