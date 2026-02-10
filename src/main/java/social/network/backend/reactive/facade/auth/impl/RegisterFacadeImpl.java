@@ -14,8 +14,6 @@ import social.network.backend.reactive.service.user.UserWriteService;
 @RequiredArgsConstructor
 public final class RegisterFacadeImpl implements RegisterFacade {
 
-    private static final String USER_EXIST_MESSAGE = "User with email %s already exists";
-
     private final GetRegistrationMapper registrationMapper;
     private final RegistrationService registrationService;
     private final UserReadService userReadService;
