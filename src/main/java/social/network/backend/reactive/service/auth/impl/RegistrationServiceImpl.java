@@ -1,6 +1,5 @@
-package social.network.backend.reactive.service.auth;
+package social.network.backend.reactive.service.auth.impl;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -8,6 +7,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import social.network.backend.reactive.model.User;
 import social.network.backend.reactive.model.enums.Role;
+import social.network.backend.reactive.service.auth.RegistrationService;
 
 @Service
 @RequiredArgsConstructor

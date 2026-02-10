@@ -1,4 +1,4 @@
-package social.network.backend.reactive.service.auth;
+package social.network.backend.reactive.service.auth.impl;
 
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -8,7 +8,9 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import social.network.backend.reactive.model.User;
+import social.network.backend.reactive.service.auth.JwtGeneratorService;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +40,7 @@ public final class JwtGeneratorServiceImpl implements JwtGeneratorService {
 
             val signedJWT = new SignedJWT(header, claimsSet);
 
-            val signer = new MACSigner(secretKey.getBytes());
+            val signer = new MACSigner(secretKey.getBytes(StandardCharsets.UTF_8));
             signedJWT.sign(signer);
 
             return signedJWT.serialize();

@@ -24,7 +24,6 @@ public final class AuthController {
     private final RegisterFacade registerFacade;
     private final MonoValidator monoValidator;
     private final LoginFacade loginFacade;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public Mono<?> login(final @RequestBody Mono<GetLoginDTO> loginDtoMono) {

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import reactor.core.publisher.Mono;
 import social.network.backend.reactive.exception.DtoValidationException;
+import social.network.backend.reactive.exception.UserExistException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,13 +33,20 @@ public final class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public Mono<ResponseEntity<String>> handleBadCredentialsException(final BadCredentialsException ex) {
-        return Mono.just(ResponseEntity.badRequest().body(ex.getMessage()));
+    public Mono<ResponseEntity<Map<String,String>>> handleBadCredentialsException(final BadCredentialsException ex) {
+        return Mono.just(ResponseEntity.badRequest().body(Map.of("error",ex.getMessage())));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public Mono<ResponseEntity<String>> handleUsernameNotFoundException(final UsernameNotFoundException ex) {
-        return Mono.just(ResponseEntity.badRequest().body(ex.getMessage()));
+    public Mono<ResponseEntity<Map<String,String>>> handleUsernameNotFoundException(final UsernameNotFoundException ex) {
+        return Mono.just(ResponseEntity.badRequest().body(Map.of("error",ex.getMessage())));
+    }
+
+    @ExceptionHandler(UserExistException.class)
+    public Mono<ResponseEntity<Map<String,String>>> handleUserExistException(final UserExistException ex) {
+        return Mono.just(ResponseEntity.badRequest()
+                .body(Map.of("error",ex.getMessage()))
+        );
     }
 
 }
