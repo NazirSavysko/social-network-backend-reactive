@@ -1,6 +1,6 @@
 package social.network.backend.reactive.dto.user;
 
-public record GetUserDTO(
+public record UpdateUserDTO(
         Integer id,
         String name,
         String surname,

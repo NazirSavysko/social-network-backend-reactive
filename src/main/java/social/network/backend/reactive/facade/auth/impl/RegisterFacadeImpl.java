@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 import social.network.backend.reactive.dto.auth.RegisterDTO;
 import social.network.backend.reactive.facade.auth.RegisterFacade;
-import social.network.backend.reactive.mapper.auth.GetRegistrationMapper;
+import social.network.backend.reactive.mapper.auth.GetRegistrationEntityMapper;
 import social.network.backend.reactive.service.auth.RegistrationService;
 import social.network.backend.reactive.service.user.UserReadService;
 import social.network.backend.reactive.service.user.UserWriteService;
@@ -14,7 +14,7 @@ import social.network.backend.reactive.service.user.UserWriteService;
 @RequiredArgsConstructor
 public final class RegisterFacadeImpl implements RegisterFacade {
 
-    private final GetRegistrationMapper registrationMapper;
+    private final GetRegistrationEntityMapper registrationMapper;
     private final RegistrationService registrationService;
     private final UserReadService userReadService;
     private final UserWriteService userWriteService;
@@ -24,7 +24,8 @@ public final class RegisterFacadeImpl implements RegisterFacade {
         return registerFacadeDTO
                 .map(this.registrationMapper::mapToEntity)
                 .flatMap(user -> userReadService.existsByEmail(user.getEmail())
-                        .then(this.registrationService.prepareUserForRegistration(user)))
+                        .then(this.registrationService.prepareUserForRegistration(user))
+                )
                 .flatMap(userWriteService::saveUser);
     }
 

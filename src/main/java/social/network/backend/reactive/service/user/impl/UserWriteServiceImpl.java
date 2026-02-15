@@ -1,8 +1,10 @@
 package social.network.backend.reactive.service.user.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import social.network.backend.reactive.exception.UserNotFoundException;
 import social.network.backend.reactive.model.User;
 import social.network.backend.reactive.repository.user.UserRepository;
@@ -16,6 +18,7 @@ public final class UserWriteServiceImpl implements UserWriteService {
 
     private static final String USER_NOT_FOUND_MESSAGE = "User with id %d not found";
 
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     @Override
@@ -32,14 +35,25 @@ public final class UserWriteServiceImpl implements UserWriteService {
     }
 
     @Override
-    public Mono<User> updateUser(final Integer id, final User user) {
+    public Mono<User> prepareUser(final User user) {
+        return Mono
+                .fromCallable(() -> {
+                    user.setPassword(passwordEncoder.encode(user.getPassword()));
+                    return user;
+                })
+                .subscribeOn(Schedulers.parallel());
+    }
+
+
+    @Override
+    public Mono<User> updateUser(final User user) {
         return this.userRepository
-                .updateUser(id, user.getName(), user.getSurname(), user.getEmail(), user.getPassword())
+                .updateUser(user.getId(), user.getName(), user.getSurname(), user.getEmail(), user.getPassword())
                 .flatMap(rowsUpdated -> {
                     if (rowsUpdated > 0) {
-                        return Mono.just(user);
+                        return this.userRepository.findById(user.getId());
                     }
-                    return Mono.error(new UserNotFoundException(format(USER_NOT_FOUND_MESSAGE, id)));
+                    return Mono.error(new UserNotFoundException(format(USER_NOT_FOUND_MESSAGE, user.getId())));
                 });
     }
 }

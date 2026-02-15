@@ -8,5 +8,7 @@ public interface UserWriteService {
 
     Mono<Void> saveUser(User user);
 
-    Mono<User> updateUser(Integer id,User user);
+    Mono<User> prepareUser(User user);
+
+    Mono<User> updateUser(User user);
 }
