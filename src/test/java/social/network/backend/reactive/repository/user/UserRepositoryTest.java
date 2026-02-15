@@ -92,5 +92,69 @@ final class UserRepositoryTest {
                 .verify();
     }
 
+    @Test
+    void test_updateUser_shouldReturnPositiveNumber(){
+        // Given
+        val userId = 1;
+        val newName = "UpdatedJohn";
+        val newSurname = "UpdatedDoe";
+        val newEmail = "updated.john@gmail.com";
+        val newPassword = "newPassword123";
+
+        // When
+        val resultMono = userRepository.updateUser(userId, newName, newSurname, newEmail, newPassword);
+
+        // Then
+        StepVerifier.create(resultMono)
+                .expectNextMatches(rowsUpdated -> rowsUpdated > 0)
+                .verifyComplete();
+    }
+
+    @Test
+    void test_updateUser_shouldReturnZero_whenUserNotFound(){
+        // Given
+        val nonExistentUserId = 999;
+        val newName = "UpdatedName";
+        val newSurname = "UpdatedSurname";
+        val newEmail = "nonexistent@mail.com";
+        val newPassword = "password123";
+
+        // When
+        val resultMono = userRepository.updateUser(nonExistentUserId, newName, newSurname, newEmail, newPassword);
+
+        // Then
+        StepVerifier.create(resultMono)
+                .expectNext(0)
+                .verifyComplete();
+    }
+
+    @Test
+    void test_updateUser_shouldUpdateAllFields(){
+        // Given
+        val userId = 1;
+        val newName = "UpdatedJohn";
+        val newSurname = "UpdatedDoe";
+        val newEmail = "updated.john@gmail.com";
+        val newPassword = "newEncodedPassword";
+
+        // When
+        val updateResult = userRepository.updateUser(userId, newName, newSurname, newEmail, newPassword);
+        val findResult = userRepository.findById(userId);
+
+        // Then
+        StepVerifier.create(updateResult)
+                .expectNext(1)
+                .verifyComplete();
+
+        StepVerifier.create(findResult)
+                .expectNextMatches(user ->
+                        user.getName().equals(newName) &&
+                        user.getSurname().equals(newSurname) &&
+                        user.getEmail().equals(newEmail) &&
+                        user.getPassword().equals(newPassword)
+                )
+                .verifyComplete();
+    }
+
 
 }

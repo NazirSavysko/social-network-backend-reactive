@@ -49,9 +49,7 @@ public final class UserController {
 
     @DeleteMapping("/delete")
     public Mono<Void> deleteUser(final @ModelAttribute("user") Mono<GetUserDTO> user) {
-      return user
-              .flatMap(userFacade::deleteUser);
-
+      return user.flatMap(userFacade::deleteUser);
     }
 
 }

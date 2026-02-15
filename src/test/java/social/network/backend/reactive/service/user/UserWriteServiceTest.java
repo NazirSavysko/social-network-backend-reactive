@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import social.network.backend.reactive.model.User;
@@ -21,6 +22,9 @@ final class UserWriteServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserWriteServiceImpl userWriteService;
@@ -71,5 +75,61 @@ final class UserWriteServiceTest {
                 .expectError(RuntimeException.class)
                 .verify();
     }
-}
 
+    @Test
+    void test_prepareUser_shouldEncodePasswordSuccessfully() {
+        // GIVEN
+        val plainPassword = "password123";
+        val encodedPassword = "$2a$10$encodedPassword";
+        val user = User.builder()
+                .id(1)
+                .email("test@mail.com")
+                .name("Test")
+                .surname("User")
+                .password(plainPassword)
+                .role(Role.ROLE_USER)
+                .build();
+
+        when(passwordEncoder.encode(plainPassword))
+                .thenReturn(encodedPassword);
+
+        // WHEN
+        val result = userWriteService.prepareUser(user);
+
+        // THEN
+        StepVerifier.create(result)
+                .expectNextMatches(preparedUser -> preparedUser.getPassword().equals(encodedPassword))
+                .verifyComplete();
+    }
+
+    @Test
+    void test_prepareUser_shouldReturnUserWithEncodedPassword() {
+        // GIVEN
+        val plainPassword = "myPassword456";
+        val encodedPassword = "$2a$10$encodedPassword456";
+        val user = User.builder()
+                .id(2)
+                .email("user2@mail.com")
+                .name("John")
+                .surname("Doe")
+                .password(plainPassword)
+                .role(Role.ROLE_USER)
+                .build();
+
+        when(passwordEncoder.encode(plainPassword))
+                .thenReturn(encodedPassword);
+
+        // WHEN
+        val result = userWriteService.prepareUser(user);
+
+        // THEN
+        StepVerifier.create(result)
+                .expectNextMatches(preparedUser ->
+                        preparedUser.getId() == 2 &&
+                        preparedUser.getEmail().equals("user2@mail.com") &&
+                        preparedUser.getName().equals("John") &&
+                        preparedUser.getPassword().equals(encodedPassword)
+                )
+                .verifyComplete();
+    }
+}
