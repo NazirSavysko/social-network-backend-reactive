@@ -23,6 +23,6 @@ public final class RegistrationServiceImpl implements RegistrationService {
                     rawUser.setRole(Role.ROLE_USER);
                     return rawUser;
                 })
-                .subscribeOn(Schedulers.boundedElastic()); // <--- "Кухня" (отдельные потоки)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 }

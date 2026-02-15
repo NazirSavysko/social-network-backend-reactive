@@ -9,11 +9,14 @@ import social.network.backend.reactive.model.User;
 import social.network.backend.reactive.repository.user.UserRepository;
 import social.network.backend.reactive.service.user.UserReadService;
 
+import static java.lang.String.format;
+
 @Service
 @RequiredArgsConstructor
 public final class UserReadServiceImpl implements UserReadService {
 
     private static final String USER_NOT_FOUND_MESSAGE = "User not found";
+    private static final String USER_EXIST_MESSAGE = "User with email %s already exists";
 
     private final UserRepository userRepository;
 
@@ -36,7 +39,7 @@ public final class UserReadServiceImpl implements UserReadService {
                 .existsByEmail(email)
                 .flatMap(exists -> {
                     if (exists) {
-                        return Mono.error(new UserExistException("User with email " + email + " already exists"));
+                        return Mono.error(new UserExistException(format(USER_EXIST_MESSAGE, email)));
                     }
                     return Mono.empty();
                 });

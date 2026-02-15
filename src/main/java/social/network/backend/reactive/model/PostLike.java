@@ -17,7 +17,6 @@ public final class PostLike {
     @Id
     private Integer id;
 
-
     private Integer userId;
 
     private Integer postId;

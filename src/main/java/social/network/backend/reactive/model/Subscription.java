@@ -21,7 +21,6 @@ public final class Subscription {
 
     private Integer subscriberId;
 
-
     private Integer targetId;
 
     private Instant subscribedAt;

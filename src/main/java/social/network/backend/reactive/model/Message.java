@@ -17,12 +17,8 @@ public final class Message {
     @Id
     private Integer id;
 
-//    @ManyToOne(fetch = LAZY)
-//    @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private Integer senderId;
 
-//    @ManyToOne(fetch = LAZY)
-//    @JoinColumn(name = "recipient_id", referencedColumnName = "id")
     private Integer recipientId;
 
     private LocalDateTime messageDate;
