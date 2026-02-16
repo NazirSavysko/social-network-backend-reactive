@@ -2,7 +2,7 @@ package social.network.backend.reactive.annotations;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.lang.annotation.Documented;
@@ -16,11 +16,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Documented
 @Constraint(validatedBy = {})
-@Size(min = 10, max = 30, message = "{user.create.errors.Email.size}")
-@Email
-public @interface ValidEmail {
+@Size(min = 1, max = 1000, message = "{posts.create.errors.Post-text.size}")
+@NotBlank(message = "{posts.create.errors.Post-text.blank}")
+public @interface ValidText {
 
-    String message() default "{user.create.errors.Email.message}";
+    String message() default "invalid text";
 
     Class<?>[] groups() default {};
 

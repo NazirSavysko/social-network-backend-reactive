@@ -16,9 +16,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Documented
 @Constraint(validatedBy = {})
-@Size(min = 8, max = 30, message = "{jakarta.validation.constraints.Password.size}")
+@Size(min = 8, max = 30, message = "{user.create.errors.Password.size}")
 @Pattern(regexp = "^[A-Z][a-zA-Z0-9]*$",
-        message = "{jakarta.validation.constraints.Password.pattern}")
+        message = "{user.create.errors.Password.pattern}")
 public @interface ValidPassword {
 
     String message() default "Invalid password";
