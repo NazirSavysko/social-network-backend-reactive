@@ -28,7 +28,7 @@ public final class PostsController {
     }
 
     @GetMapping("/user/{userId}")
-    public Flux<?> getAllPostsByUser(final @PathVariable Integer userId,final Pageable pageable) {
+    public Flux<?> getAllPostsByUser(final @PathVariable Integer userId, final Pageable pageable) {
 
         return this.postFacade
                 .getAllPostsByUserId(userId, pageable);

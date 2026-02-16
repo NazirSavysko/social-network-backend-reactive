@@ -17,6 +17,7 @@ import static reactor.core.scheduler.Schedulers.boundedElastic;
 
 @Service
 public final class FileServiceImpl implements FileService {
+
     private static final String THE_SOURCE_DIRECTORY = getenv().getOrDefault("APP_DATA_DIR", "data");
     private static final String SUFFIX = ".txt";
     private static final String FORMAT_IMAGE_IN_BASE64 = "data:image/%s;base64,%s";
