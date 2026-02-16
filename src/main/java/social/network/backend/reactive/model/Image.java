@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 @Getter
 @Setter
-@Table(name = "image")
+@Table(name = "image", schema = "social_network")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

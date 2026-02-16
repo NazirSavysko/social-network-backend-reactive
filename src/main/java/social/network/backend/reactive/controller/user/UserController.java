@@ -22,7 +22,7 @@ public final class UserController {
         return this.userFacade.getUserById(userId);
     }
 
-    @GetMapping("/")
+    @GetMapping()
     public Mono<GetUserDTO> getUser(final @ModelAttribute("user") Mono<GetUserDTO> user) {
         return user;
     }

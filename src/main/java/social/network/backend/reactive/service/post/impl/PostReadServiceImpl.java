@@ -15,6 +15,6 @@ public final class PostReadServiceImpl implements PostReadService {
     private final PostRepository postRepository;
     @Override
     public Flux<PostWithLikesAndImageProjection> getAllPostsByUserId(final Integer userId, final Pageable pageable) {
-        return this.postRepository.findAllByUserIdWithDetails(userId, pageable);
+        return this.postRepository.findAllByUserIdWithDetails(userId, pageable.getPageSize(), pageable.getOffset());
     }
 }

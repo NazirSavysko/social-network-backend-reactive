@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.Instant;
 
 
-@Table(name = "subscription")
+@Table(name = "subscription", schema = "social_network")
 @Getter
 @Setter
 @NoArgsConstructor

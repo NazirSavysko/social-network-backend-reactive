@@ -10,16 +10,18 @@ import social.network.backend.reactive.model.projection.PostWithLikesAndImagePro
 public interface PostRepository extends ReactiveCrudRepository<Post, Integer> {
 
     @Query("""
-        SELECT 
-            p.id, 
-            p.post_text, 
-            p.post_date,
-            i.file_path AS image_path,
-            (SELECT COUNT(*) FROM post_like pl WHERE pl.post_id = p.id) AS likes_count
-        FROM post p
-        LEFT JOIN image i ON p.image_id = i.id
-        WHERE p.user_id = :userId
-        ORDER BY p.post_date DESC
-    """)
-    Flux<PostWithLikesAndImageProjection> findAllByUserIdWithDetails(Integer userId, Pageable pageable);
+                    SELECT 
+                        p.id, 
+                        p.post_text, 
+                        p.post_date,
+                        i.file_path AS image_path,
+                        (SELECT COUNT(*) FROM social_network.post_like pl WHERE pl.post_id = p.id) AS likes_count
+                    FROM social_network.post p
+                    JOIN social_network.image i ON p.image_id = i.id
+                    WHERE p.user_id = :userId
+                    ORDER BY p.post_date DESC
+               LIMIT :limit
+                OFFSET :offset
+            """)
+    Flux<PostWithLikesAndImageProjection> findAllByUserIdWithDetails(Integer userId, long limit, long offset);
 }

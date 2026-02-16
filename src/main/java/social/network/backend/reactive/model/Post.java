@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.Instant;
 
 
-@Table(name = "post")
+@Table(name = "post", schema = "social_network")
 @Setter
 @Getter
 @AllArgsConstructor

@@ -1,6 +1,7 @@
 package social.network.backend.reactive.controller.post;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -29,7 +30,6 @@ public final class PostsController {
 
     @GetMapping("/user/{userId}")
     public Flux<?> getAllPostsByUser(final @PathVariable Integer userId, final Pageable pageable) {
-
         return this.postFacade
                 .getAllPostsByUserId(userId, pageable);
     }

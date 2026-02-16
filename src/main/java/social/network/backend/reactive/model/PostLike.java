@@ -6,7 +6,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 
 
-@Table(name = "post_like")
+@Table(name = "post_like", schema = "social_network")
 @Setter
 @Getter
 @AllArgsConstructor

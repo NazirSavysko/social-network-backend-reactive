@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
 
-@Table(name = "message")
+@Table(name = "message", schema = "social_network")
 @Setter
 @Getter
 @AllArgsConstructor
