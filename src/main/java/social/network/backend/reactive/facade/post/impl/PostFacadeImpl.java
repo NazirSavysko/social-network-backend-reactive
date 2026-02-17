@@ -12,6 +12,7 @@ import social.network.backend.reactive.facade.post.PostFacade;
 import social.network.backend.reactive.mapper.post.GetPostWithLikeAndImageDetailsDtoMapper;
 import social.network.backend.reactive.model.Image;
 import social.network.backend.reactive.model.Post;
+import social.network.backend.reactive.model.projection.PostWithLikesAndImageProjection;
 import social.network.backend.reactive.service.file.FileService;
 import social.network.backend.reactive.service.image.ImageService;
 import social.network.backend.reactive.service.post.PostReadService;
@@ -35,16 +36,7 @@ public final class PostFacadeImpl implements PostFacade {
     public Flux<GetPostDTO> getAllPostsByUserId(final Integer userId, final Pageable pageable) {
         return this.postReadService
                 .getAllPostsByUserId(userId, pageable)
-                .flatMap(postWithLikesAndImageProjection -> {
-                    return this.fileService.getContentFromFile(postWithLikesAndImageProjection.image())
-                            .map(content -> new GetPostDTO(
-                                    postWithLikesAndImageProjection.likesCount(),
-                                    postWithLikesAndImageProjection.postText(),
-                                    postWithLikesAndImageProjection.postDate(),
-                                    postWithLikesAndImageProjection.id(),
-                                    content
-                            ));
-                });
+                .flatMap(this::convertIntoGetPostDTO);
 
     }
 
@@ -84,6 +76,24 @@ public final class PostFacadeImpl implements PostFacade {
                                         );
                                     });
                         }
+                );
+    }
+
+    @Override
+    public Mono<GetPostDTO> getPostById(final Integer postId) {
+        return this.postReadService
+                .getPostById(postId)
+                .flatMap(this::convertIntoGetPostDTO);
+    }
+
+    private Mono<? extends GetPostDTO> convertIntoGetPostDTO(final PostWithLikesAndImageProjection postWithLikesAndImageProjection) {
+        return this.fileService.getContentFromFile(postWithLikesAndImageProjection.image())
+                .map(content -> new GetPostDTO(
+                        postWithLikesAndImageProjection.likesCount(),
+                        postWithLikesAndImageProjection.postText(),
+                        postWithLikesAndImageProjection.postDate(),
+                        postWithLikesAndImageProjection.id(),
+                        content)
                 );
     }
 }

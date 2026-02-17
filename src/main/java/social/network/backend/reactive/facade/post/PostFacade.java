@@ -12,5 +12,9 @@ public interface PostFacade {
     @Transactional(readOnly = true)
     Flux<GetPostDTO> getAllPostsByUserId(Integer userId, Pageable pageable);
 
-    Mono<?> createPost(Mono<CreatePostDTO> createPostDTOMono);
+    Mono<GetPostDTO> createPost(Mono<CreatePostDTO> createPostDTOMono);
+
+    Mono<GetPostDTO> getPostById(Integer postId);
+
+    Mono<Void> deletePost(Mono<GetPostDTO> post);
 }

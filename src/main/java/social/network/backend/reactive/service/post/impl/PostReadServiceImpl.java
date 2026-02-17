@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import social.network.backend.reactive.model.projection.PostWithLikesAndImageProjection;
 import social.network.backend.reactive.repository.post.PostRepository;
 import social.network.backend.reactive.service.post.PostReadService;
@@ -16,5 +17,10 @@ public final class PostReadServiceImpl implements PostReadService {
     @Override
     public Flux<PostWithLikesAndImageProjection> getAllPostsByUserId(final Integer userId, final Pageable pageable) {
         return this.postRepository.findAllByUserIdWithDetails(userId, pageable.getPageSize(), pageable.getOffset());
+    }
+
+    @Override
+    public Mono<PostWithLikesAndImageProjection> getPostById(final Integer postId) {
+        return this.postRepository.findByIdWithDetails(postId);
     }
 }
