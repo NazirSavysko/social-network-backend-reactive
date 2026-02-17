@@ -38,16 +38,21 @@ public final class PostController {
     }
 
     @PutMapping("/update")
-    public Mono<?> updatePost(final @ModelAttribute(value = "post")  Mono<GetPostDTO> post,
-                                        final @RequestBody Mono<UpdatePostPayload> postPayload){
+    public Mono<GetPostDTO> updatePost(final @ModelAttribute(value = "post") Mono<GetPostDTO> post,
+                                       final @RequestBody Mono<UpdatePostPayload> postPayload) {
         return postPayload
                 .transform(this.monoValidator::validate)
-                .flatMap()
+                .zipWith(post, (updatePostPayload, postDTO) -> new UpdatePostDTO(
+                        updatePostPayload.text(),
+                        updatePostPayload.imageInFormatBase64(),
+                        postDTO.id()
+                ))
+                .as(this.postFacade::updatePost);
     }
 
     @DeleteMapping("/delete")
-    public Mono<Void> deletePost(final @ModelAttribute(value = "post")  Mono<GetPostDTO> post) {
-      return this.postFacade.deletePost(post);
+    public Mono<Void> deletePost(final @ModelAttribute(value = "post") Mono<GetPostDTO> post) {
+        return this.postFacade.deletePost(post);
     }
 
 }

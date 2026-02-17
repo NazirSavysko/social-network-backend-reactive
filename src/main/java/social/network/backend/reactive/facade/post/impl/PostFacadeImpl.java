@@ -6,8 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import social.network.backend.reactive.controller.payload.UpdatePostPayload;
 import social.network.backend.reactive.dto.post.CreatePostDTO;
 import social.network.backend.reactive.dto.post.GetPostDTO;
+import social.network.backend.reactive.dto.post.UpdatePostDTO;
 import social.network.backend.reactive.facade.post.PostFacade;
 import social.network.backend.reactive.mapper.post.GetPostWithLikeAndImageDetailsDtoMapper;
 import social.network.backend.reactive.model.Image;
@@ -84,6 +86,35 @@ public final class PostFacadeImpl implements PostFacade {
         return this.postReadService
                 .getPostById(postId)
                 .flatMap(this::convertIntoGetPostDTO);
+    }
+
+    @Override
+    public Mono<Void> deletePost(final Mono<GetPostDTO> post) {
+        return null;
+    }
+
+    @Override
+    public Mono<GetPostDTO> updatePost(final Mono<UpdatePostDTO> updatePostPayload) {
+        return updatePostPayload
+                .flatMap(updatePostDTO -> {
+                    return postReadService
+                            .getPostById(updatePostDTO.id())
+                            .flatMap(post -> {
+
+                            })
+                            .flatMap(user -> {
+                                        return this.fileService.writeToFile(user.getEmail(), createPostDTO.imageInFormatBase64());
+                                    }
+                            ).flatMap(filePath -> {
+                                        val newImage = Image.builder()
+                                                .filePath(filePath)
+                                                .build();
+
+                                        return this.imageService.saveImage(newImage);
+                                    }
+                            )
+                            .flatMap(postWriteService::);
+                });
     }
 
     private Mono<? extends GetPostDTO> convertIntoGetPostDTO(final PostWithLikesAndImageProjection postWithLikesAndImageProjection) {
