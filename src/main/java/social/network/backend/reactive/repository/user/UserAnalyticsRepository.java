@@ -10,12 +10,12 @@ import java.time.Instant;
 public interface UserAnalyticsRepository extends ReactiveCrudRepository<User, Integer> {
 
     @Query("""
-                SELECT u.*
-                FROM social_user u
-                LEFT JOIN post p ON p.user_id = u.id AND p.post_date BETWEEN :start AND :end
-                GROUP BY u.id
-                ORDER BY COUNT(p.id) DESC
-                LIMIT :limit
+               SELECT u.*
+               FROM social_network.social_user u
+               LEFT JOIN social_network.post p ON p.user_id = u.id AND p.post_date BETWEEN :start AND :end
+               GROUP BY u.id
+               ORDER BY COUNT(p.id) DESC
+               LIMIT :limit
             """)
     Flux<User> findTopUsersByAvgPostsPerActiveDay(int limit, Instant start, Instant end);
 

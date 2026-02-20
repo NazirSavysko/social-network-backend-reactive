@@ -1,4 +1,4 @@
-CREATE SCHEMA social_network;
+CREATE SCHEMA IF NOT EXISTS social_network;
 
 -- TABLES
 CREATE TABLE social_network.social_user
