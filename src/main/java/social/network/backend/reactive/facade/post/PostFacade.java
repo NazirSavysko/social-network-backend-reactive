@@ -18,7 +18,7 @@ public interface PostFacade {
 
     Mono<GetPostDTO> getPostById(Integer postId);
 
-    Mono<Void> deletePost(Mono<GetPostDTO> post);
+    Mono<Void> deletePost(Integer postId);
 
     Mono<GetPostDTO> updatePost(Mono<UpdatePostDTO> updatePostPayload);
 }

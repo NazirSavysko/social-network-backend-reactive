@@ -6,12 +6,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import social.network.backend.reactive.controller.payload.UpdatePostPayload;
 import social.network.backend.reactive.dto.post.CreatePostDTO;
 import social.network.backend.reactive.dto.post.GetPostDTO;
 import social.network.backend.reactive.dto.post.UpdatePostDTO;
 import social.network.backend.reactive.facade.post.PostFacade;
-import social.network.backend.reactive.mapper.post.GetPostWithLikeAndImageDetailsDtoMapper;
 import social.network.backend.reactive.model.Image;
 import social.network.backend.reactive.model.Post;
 import social.network.backend.reactive.model.projection.PostWithLikesAndImageProjection;
@@ -23,6 +21,7 @@ import social.network.backend.reactive.service.user.UserReadService;
 
 import java.time.Instant;
 
+
 @Component
 @RequiredArgsConstructor
 public final class PostFacadeImpl implements PostFacade {
@@ -30,7 +29,6 @@ public final class PostFacadeImpl implements PostFacade {
     private final PostWriteService postWriteService;
     private final PostReadService postReadService;
     private final UserReadService userReadService;
-    private final GetPostWithLikeAndImageDetailsDtoMapper dtoMapper;
     private final ImageService imageService;
     private final FileService fileService;
 
@@ -45,39 +43,25 @@ public final class PostFacadeImpl implements PostFacade {
     @Override
     public Mono<GetPostDTO> createPost(final Mono<CreatePostDTO> createPostDTOMono) {
         return createPostDTOMono
-                .flatMap(createPostDTO -> {
-                            return userReadService
-                                    .getUserById(createPostDTO.userId())
-                                    .flatMap(user -> {
-                                                return this.fileService.writeToFile(user.getEmail(), createPostDTO.imageInFormatBase64());
-                                            }
-                                    ).flatMap(filePath -> {
-                                                val newImage = Image.builder()
-                                                        .filePath(filePath)
-                                                        .build();
+                .flatMap(createPostDTO -> userReadService
+                        .getUserById(createPostDTO.userId())
+                        .flatMap(user -> this.saveImage(user.getEmail(), createPostDTO.imageInFormatBase64()))
+                        .flatMap(image -> {
+                            val post = Post.builder()
+                                    .userId(createPostDTO.userId())
+                                    .postText(createPostDTO.postText())
+                                    .postDate(Instant.now())
+                                    .imageId(image.getId())
+                                    .build();
 
-                                                return this.imageService.saveImage(newImage);
-                                            }
-                                    )
-                                    .flatMap(image -> {
-                                        val post = Post.builder()
-                                                .userId(createPostDTO.userId())
-                                                .postText(createPostDTO.postText())
-                                                .postDate(Instant.now())
-                                                .imageId(image.getId())
-                                                .build();
-
-                                        return this.postWriteService.savePost(post);
-                                    }).map(savedPost -> {
-                                        return new GetPostDTO(
-                                                0,
-                                                savedPost.getPostText(),
-                                                savedPost.getPostDate(),
-                                                savedPost.getId(),
-                                                createPostDTO.imageInFormatBase64()
-                                        );
-                                    });
-                        }
+                            return this.postWriteService.savePost(post);
+                        }).map(savedPost -> new GetPostDTO(
+                                0,
+                                savedPost.getPostText(),
+                                savedPost.getPostDate(),
+                                savedPost.getId(),
+                                createPostDTO.imageInFormatBase64()
+                        ))
                 );
     }
 
@@ -89,32 +73,42 @@ public final class PostFacadeImpl implements PostFacade {
     }
 
     @Override
-    public Mono<Void> deletePost(final Mono<GetPostDTO> post) {
+    public Mono<Void> deletePost(final Integer postId) {
         return null;
     }
 
     @Override
     public Mono<GetPostDTO> updatePost(final Mono<UpdatePostDTO> updatePostPayload) {
         return updatePostPayload
-                .flatMap(updatePostDTO -> {
-                    return postReadService
-                            .getPostById(updatePostDTO.id())
-                            .flatMap(post -> {
+                .flatMap(updatePostDTO -> postReadService
+                        .getPostById(updatePostDTO.id())
+                        .flatMap(post -> this.saveImage(updatePostDTO.userEmail(), updatePostDTO.imageInFormatBase64())
+                                .flatMap(savedImage -> this.postWriteService.updatePost(
+                                        post.id(),
+                                        post.postText(),
+                                        Instant.now(),
+                                        savedImage.getId()
+                                )).map(
+                                        updatedPost -> new GetPostDTO(
+                                                updatedPost.likesCount(),
+                                                updatedPost.postText(),
+                                                updatedPost.postDate(),
+                                                updatedPost.id(),
+                                                updatePostDTO.imageInFormatBase64()
+                                        )
+                                )));
+    }
 
-                            })
-                            .flatMap(user -> {
-                                        return this.fileService.writeToFile(user.getEmail(), createPostDTO.imageInFormatBase64());
-                                    }
-                            ).flatMap(filePath -> {
-                                        val newImage = Image.builder()
-                                                .filePath(filePath)
-                                                .build();
+    private Mono<Image> saveImage(final String directory, final String imageInFormatBase64) {
+        return this.fileService.writeToFile(directory, imageInFormatBase64)
+                .flatMap(filePath -> {
+                    val image = Image.builder()
+                            .filePath(filePath)
+                            .build();
 
-                                        return this.imageService.saveImage(newImage);
-                                    }
-                            )
-                            .flatMap(postWriteService::);
+                    return this.imageService.saveImage(image);
                 });
+
     }
 
     private Mono<? extends GetPostDTO> convertIntoGetPostDTO(final PostWithLikesAndImageProjection postWithLikesAndImageProjection) {

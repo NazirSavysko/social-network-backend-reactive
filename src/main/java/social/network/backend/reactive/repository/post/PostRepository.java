@@ -1,12 +1,15 @@
 package social.network.backend.reactive.repository.post;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import social.network.backend.reactive.model.Post;
 import social.network.backend.reactive.model.projection.PostWithLikesAndImageProjection;
+
+import java.time.Instant;
 
 public interface PostRepository extends ReactiveCrudRepository<Post, Integer> {
 
@@ -38,4 +41,12 @@ public interface PostRepository extends ReactiveCrudRepository<Post, Integer> {
                     WHERE p.id = :postId
             """)
     Mono<PostWithLikesAndImageProjection> findByIdWithDetails(Integer postId);
+
+    @Modifying
+    @Query("""
+            UPDATE social_network.post
+                        SET post_text = :content, post_date = :data, image_id = :imageId 
+                        WHERE id = :id
+            """)
+    Mono<PostWithLikesAndImageProjection> updatePost(Integer id, String content, Instant data, Integer imageId);
 }
