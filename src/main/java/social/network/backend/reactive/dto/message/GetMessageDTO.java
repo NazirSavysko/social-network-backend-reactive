@@ -1,4 +1,11 @@
 package social.network.backend.reactive.dto.message;
 
-public record GetMessageDTO(){
+import social.network.backend.reactive.dto.user.GetUserDTO;
+
+public record GetMessageDTO(
+        Integer id,
+        String content,
+        GetUserDTO sender,
+        GetUserDTO receiver
+){
 }

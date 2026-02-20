@@ -70,23 +70,27 @@ public final class PostFacadeImpl implements PostFacade {
     @Override
     public Mono<GetPostDTO> getPostById(final Integer postId) {
         return this.postReadService
-                .getPostById(postId)
+                .getPostWithDetailsById(postId)
                 .map(this.dtoMapper::mapToDTO);
     }
 
     @Override
     public Mono<Void> deletePost(final Integer postId) {
-        return this.postWriteService
-                .deletePost(postId)
-                .then(Mono.defer(() -> this.imageReadService.getImageById(postId)
-                        .flatMap(image -> this.fileService.deleteFile(image.getFilePath()))));
+        return this.postReadService.getPostById(postId)
+                .flatMap(post -> this.postWriteService
+                        .deletePost(post.getId())
+                        .then(Mono.defer(() -> this.imageReadService.getImageById(post.getImageId())
+                                .flatMap(image -> this.fileService.deleteFile(image.getFilePath())))
+                        )
+                );
+
     }
 
     @Override
     public Mono<GetPostDTO> updatePost(final Mono<UpdatePostDTO> updatePostPayload) {
         return updatePostPayload
                 .flatMap(updatePostDTO -> this.postReadService
-                        .getPostById(updatePostDTO.id())
+                        .getPostWithDetailsById(updatePostDTO.id())
                         .flatMap(post -> this.saveImage(updatePostDTO.userEmail(), updatePostDTO.imageInFormatBase64())
                                 .flatMap(savedImage -> this.postWriteService.updatePost(
                                                 post.id(),

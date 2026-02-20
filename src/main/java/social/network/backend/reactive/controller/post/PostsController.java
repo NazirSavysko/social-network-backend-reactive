@@ -21,10 +21,10 @@
         private final PostFacade postFacade;
 
         @PostMapping("/create")
-        public Mono<ResponseEntity<GetPostDTO>> createPost(final @RequestBody Mono<CreatePostDTO> payloadMono,
+        public Mono<ResponseEntity<GetPostDTO>> createPost(final @RequestBody Mono<CreatePostDTO> createPostDTO,
                                                            final UriComponentsBuilder uriComponentsBuilder) {
 
-            return payloadMono
+            return createPostDTO
                     .transform(this.monoValidator::validate)
                     .as(this.postFacade::createPost)
                     .map(getPostDTO -> ResponseEntity.created(
@@ -34,7 +34,7 @@
         }
 
         @GetMapping("/user/{userId}")
-        public Flux<?> getAllPostsByUser(final @PathVariable Integer userId, final Pageable pageable) {
+        public Flux<GetPostDTO> getAllPostsByUser(final @PathVariable Integer userId, final Pageable pageable) {
             return this.postFacade
                     .getAllPostsByUserId(userId, pageable);
         }

@@ -8,21 +8,16 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import social.network.backend.reactive.service.file.FileService;
 
-import java.nio.file.Path;
-
-import static java.lang.String.format;
 import static java.lang.System.getenv;
 import static java.nio.file.Files.*;
 import static java.nio.file.Paths.get;
 import static java.util.Base64.getDecoder;
-import static java.util.Base64.getEncoder;
 import static reactor.core.scheduler.Schedulers.boundedElastic;
 
 @Service
 public final class FileServiceImpl implements FileService {
 
     private static final String THE_SOURCE_DIRECTORY = getenv().getOrDefault("APP_DATA_DIR", "data");
-    private static final String FORMAT_IMAGE_IN_BASE64 = "data:image/%s;base64,%s";
 
     @Override
     public Mono<String> writeToFile(final String directoryName, final String content) {

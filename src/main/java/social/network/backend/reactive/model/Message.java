@@ -2,6 +2,7 @@ package social.network.backend.reactive.model;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public final class Message {
 
     private Integer senderId;
 
+    @Column("receiver_id")
     private Integer recipientId;
 
     private LocalDateTime messageDate;
