@@ -10,4 +10,6 @@ public interface PostWriteService {
     Mono<Post> savePost(Post post);
 
     Mono<PostWithLikesAndImageProjection> updatePost(Integer id, String content, Instant data, Integer imageId);
+
+    Mono<Void> deletePost(Integer postId);
 }

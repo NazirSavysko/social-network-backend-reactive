@@ -17,7 +17,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Documented
 @Constraint(validatedBy = {})
-@Size(min = 1, max = 1000, message = "{posts.create.errors.Post-text.size}")
 @NotBlank(message = "{posts.create.errors.Image.blank}")
 @Pattern(
         regexp = "^data:image/(png|jpg|jpeg|gif);base64,[A-Za-z0-9+/]+={0,2}$",

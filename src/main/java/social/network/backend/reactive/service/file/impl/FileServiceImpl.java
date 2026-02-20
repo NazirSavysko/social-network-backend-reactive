@@ -1,5 +1,8 @@
 package social.network.backend.reactive.service.file.impl;
 
+import lombok.val;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -19,52 +22,61 @@ import static reactor.core.scheduler.Schedulers.boundedElastic;
 public final class FileServiceImpl implements FileService {
 
     private static final String THE_SOURCE_DIRECTORY = getenv().getOrDefault("APP_DATA_DIR", "data");
-    private static final String SUFFIX = ".txt";
     private static final String FORMAT_IMAGE_IN_BASE64 = "data:image/%s;base64,%s";
 
     @Override
     public Mono<String> writeToFile(final String directoryName, final String content) {
-
         return Mono.fromCallable(() -> {
-            final String cleanBase64 = content.contains(",") ? content.split(",")[1] : content;
+            String cleanBase64 = content;
+            String extension = "jpg";
 
-            final byte[] data = getDecoder().decode(cleanBase64);
+            if (content.contains(",")) {
+                val parts = content.split(",");
+                val mimeType = parts[0].split(";")[0];
+                val slashIndex = mimeType.indexOf('/');
+                if (slashIndex != -1) {
+                    extension = mimeType.substring(slashIndex + 1);
+                }
+                cleanBase64 = parts[1];
+            }
 
-            Path dirPath = get(THE_SOURCE_DIRECTORY, directoryName);
+            val data = getDecoder().decode(cleanBase64);
+
+            val dirPath = get(THE_SOURCE_DIRECTORY, directoryName);
             if (!exists(dirPath)) {
                 createDirectories(dirPath);
             }
 
-            final Path tempFile = createTempFile(dirPath, generateFileName(), SUFFIX);
+            val fileName = generateFileName() + "." + extension;
+            val filePath = dirPath.resolve(fileName);
 
-            write(tempFile, data);
+            write(filePath, data);
 
-            return tempFile.toAbsolutePath().toString();
+            return directoryName + "/" + fileName;
         }).subscribeOn(boundedElastic());
     }
 
-    @Override
-    public Mono<String> getContentFromFile(final String filePath) {
+    public Mono<Resource> getFileAsResource(final String filePath) {
         return Mono.fromCallable(() -> {
-            final Path path = get(filePath);
-            final byte[] bytes = readAllBytes(path);
-            final String suffix = path.getFileName().toString().substring(path.getFileName().toString().lastIndexOf(".") + 1);
+            val path = get(THE_SOURCE_DIRECTORY, filePath);
+            final Resource resource = new FileSystemResource(path);
 
-            final String base64 = getEncoder().encodeToString(bytes);
-
-            return format(FORMAT_IMAGE_IN_BASE64, suffix, base64);
+            if (resource.exists() && resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("File not found: " + filePath);
+            }
         }).subscribeOn(Schedulers.boundedElastic());
     }
-
     @Override
     public Mono<Void> deleteFile(final String filePath) {
-        return Mono.fromCallable(() -> {
-                    deleteIfExists(get(filePath));
-
-                    return null;
-                })
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+        return Mono.fromRunnable(() -> {
+            try {
+                deleteIfExists(get(THE_SOURCE_DIRECTORY, filePath));
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to delete file", e);
+            }
+        }).subscribeOn(boundedElastic()).then();
     }
 
     private String generateFileName() {

@@ -1,11 +1,12 @@
 package social.network.backend.reactive.controller.payload;
 
+import social.network.backend.reactive.annotations.ValidImageFormat;
 import social.network.backend.reactive.annotations.ValidText;
 
 public record UpdatePostPayload(
         @ValidText
         String text,
-        @ValidText
+        @ValidImageFormat
         String imageInFormatBase64
 ) {
 }

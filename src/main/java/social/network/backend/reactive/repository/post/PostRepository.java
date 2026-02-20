@@ -1,6 +1,5 @@
 package social.network.backend.reactive.repository.post;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Modifying;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -14,11 +13,11 @@ import java.time.Instant;
 public interface PostRepository extends ReactiveCrudRepository<Post, Integer> {
 
     @Query("""
-                    SELECT 
-                        p.id, 
-                        p.post_text, 
+                    SELECT
+                        p.id,
+                        p.post_text,
                         p.post_date,
-                        i.file_path AS image_path,
+                        i.file_path AS image,
                         (SELECT COUNT(*) FROM social_network.post_like pl WHERE pl.post_id = p.id) AS likes_count
                     FROM social_network.post p
                     JOIN social_network.image i ON p.image_id = i.id
@@ -30,11 +29,11 @@ public interface PostRepository extends ReactiveCrudRepository<Post, Integer> {
     Flux<PostWithLikesAndImageProjection> findAllByUserIdWithDetails(Integer userId, long limit, long offset);
 
     @Query("""
-                    SELECT 
-                        p.id, 
-                        p.post_text, 
+                    SELECT
+                        p.id,
+                        p.post_text,
                         p.post_date,
-                        i.file_path AS image_path,
+                        i.file_path AS image,
                         (SELECT COUNT(*) FROM social_network.post_like pl WHERE pl.post_id = p.id) AS likes_count
                     FROM social_network.post p
                     JOIN social_network.image i ON p.image_id = i.id
@@ -45,8 +44,9 @@ public interface PostRepository extends ReactiveCrudRepository<Post, Integer> {
     @Modifying
     @Query("""
             UPDATE social_network.post
-                        SET post_text = :content, post_date = :data, image_id = :imageId 
+                        SET post_text = :content, post_date = :data, image_id = :imageId
                         WHERE id = :id
             """)
-    Mono<PostWithLikesAndImageProjection> updatePost(Integer id, String content, Instant data, Integer imageId);
+    Mono<Integer> updatePost(Integer id, String content, Instant data, Integer imageId);
+
 }

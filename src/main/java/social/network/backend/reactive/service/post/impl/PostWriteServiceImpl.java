@@ -22,6 +22,17 @@ public final class PostWriteServiceImpl implements PostWriteService {
 
     @Override
     public Mono<PostWithLikesAndImageProjection> updatePost(final Integer id, final String content, final Instant data, final Integer imageId) {
-        return this.postRepository.updatePost(id,content,data,imageId);
+        return this.postRepository.updatePost(id,content,data,imageId)
+                .flatMap(count -> {
+                    if(count == 0) return Mono.error(new RuntimeException("Post not found"));
+
+                    return this.postRepository.findByIdWithDetails(id);
+                });
+
+    }
+
+    @Override
+    public Mono<Void> deletePost(final Integer postId) {
+        return this.postRepository.deleteById(postId);
     }
 }
