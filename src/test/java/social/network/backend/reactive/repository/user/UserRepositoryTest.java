@@ -3,7 +3,7 @@ package social.network.backend.reactive.repository.user;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.data.r2dbc.test.autoconfigure.DataR2dbcTest;
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import reactor.test.StepVerifier;
 import social.network.backend.reactive.model.User;
 import social.network.backend.reactive.model.enums.Role;
