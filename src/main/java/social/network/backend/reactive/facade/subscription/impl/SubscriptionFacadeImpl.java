@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import social.network.backend.reactive.controller.payload.UpdateSubscriptionPayload;
 import social.network.backend.reactive.dto.subscription.*;
 import social.network.backend.reactive.dto.user.GetUserDTO;
 import social.network.backend.reactive.facade.subscription.SubscriptionFacade;

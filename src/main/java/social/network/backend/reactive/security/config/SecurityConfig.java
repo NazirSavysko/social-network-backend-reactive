@@ -41,8 +41,11 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
-                        .anyExchange().permitAll()
+                .authorizeExchange(exchanges ->
+                        exchanges
+                                .pathMatchers("/api/v1/auth/**").permitAll()
+                                .pathMatchers("/api/v1/admins/**").hasRole("ADMIN")
+                                .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter))

@@ -1,6 +1,7 @@
 package social.network.backend.reactive.service.subsription.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import social.network.backend.reactive.model.Subscription;
@@ -30,6 +31,7 @@ public final class SubscriptionWriteServiceImpl implements SubscriptionWriteServ
 
         return this.subscriptionRepository
                 .save(subscription)
+                .onErrorMap(DuplicateKeyException.class, e -> new IllegalArgumentException("You are already subscribed to this user."))
                 .flatMap(savedSubscription -> this.subscriptionRepository
                         .findSubscriptionWithSubscriberAndTargetById(savedSubscription.getId())
                 );

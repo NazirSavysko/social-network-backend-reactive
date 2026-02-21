@@ -34,8 +34,9 @@ public final class MessageFacadeImpl implements MessageFacade {
 
     @Override
     public Flux<GetMessageDTO> getAllMessagesByUserId(final Integer userId, final Pageable pageable) {
-        return this.messageReadService
-                .getAllMessagesByUserId(userId, pageable)
+        return this.userReadService.getUserById(userId)
+                .flatMap(user -> this.accessValidator.checkOwnerOrAdmin(user, user.getEmail()))
+                .flatMapMany(validUser -> this.messageReadService.getAllMessagesByUserId(userId, pageable))
                 .map(this.getMessageDTOMapper::mapToDTO);
     }
 
