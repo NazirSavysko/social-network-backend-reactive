@@ -17,5 +17,5 @@ public interface SubscriptionReadService {
 
     Mono<Integer> countSubscriberByUserId(Integer userId);
 
-    Flux<UserProjection> getSubscribersByUserId(Integer userId);
+    Flux<UserProjection> getSubscribersByUserId(Integer userId, Pageable pageable);
 }

@@ -40,4 +40,21 @@ public final class AccessValidator {
             return Mono.error(new AccessDeniedException("Forbidden"));
         });
     }
+
+    public <T> Mono<T> checkSubscriptionDeleteAccess(T targetObject, String subscriberEmail, String targetEmail) {
+        return getAuth().flatMap(auth -> {
+            String currentUserEmail = auth.getName();
+
+            boolean isSubscriber = java.util.Objects.equals(subscriberEmail, currentUserEmail);
+            boolean isTarget = java.util.Objects.equals(targetEmail, currentUserEmail);
+
+            if (isAdmin(auth) || isSubscriber || isTarget) {
+                return reactor.core.publisher.Mono.just(targetObject);
+            }
+
+            return reactor.core.publisher.Mono.error(
+                    new org.springframework.security.access.AccessDeniedException("Forbidden: You can only delete your own subscriptions or followers")
+            );
+        });
+    }
 }

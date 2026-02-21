@@ -40,7 +40,7 @@ public final class SubscriptionReadServiceImpl implements SubscriptionReadServic
     }
 
     @Override
-    public Flux<UserProjection> getSubscribersByUserId(final Integer userId) {
-        return this.subscriptionRepository.findSubscribersByTargetId(userId);
+    public Flux<UserProjection> getSubscribersByUserId(final Integer userId,final Pageable pageable) {
+        return this.subscriptionRepository.findSubscribersByTargetId(userId, pageable.getPageSize(), pageable.getOffset());
     }
 }

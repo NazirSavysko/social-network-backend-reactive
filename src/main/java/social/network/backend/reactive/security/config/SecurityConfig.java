@@ -27,7 +27,6 @@ public class SecurityConfig {
 
     private final Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtConverter;
 
-
     @Bean
     public ReactiveJwtDecoder jwtDecoder(final @Value("${jwt.secret}") String secretKey) {
         SecretKey originalKey = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");

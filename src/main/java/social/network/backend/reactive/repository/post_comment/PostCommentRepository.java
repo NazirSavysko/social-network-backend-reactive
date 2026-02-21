@@ -19,7 +19,7 @@ public interface PostCommentRepository extends ReactiveCrudRepository<PostCommen
             FROM social_network.post_comment pc
             JOIN social_network.social_user u ON pc.user_id = u.id
             WHERE pc.post_id = :postId
-            ORDER BY pc.created_at DESC
+            ORDER BY pc.comment_date DESC
             LIMIT :pageSize
             OFFSET :offset
             """)

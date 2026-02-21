@@ -77,6 +77,8 @@ public interface SubscriptionRepository extends ReactiveCrudRepository<Subscript
             FROM social_network.subscription s
             JOIN social_network.social_user u ON s.subscriber_id = u.id
             WHERE s.target_id = :userId
+            LIMIT :pageSize
+            OFFSET :offset
             """)
-    Flux<UserProjection> findSubscribersByTargetId(Integer userId);
+    Flux<UserProjection> findSubscribersByTargetId(Integer userId, int pageSize, long offset);
 }
