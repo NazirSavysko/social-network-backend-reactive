@@ -17,26 +17,20 @@ public final class UserController {
     private final UserProfileFacade userFacade;
     private final MonoValidator monoValidator;
 
-    @ModelAttribute("user")
-    public Mono<GetUserDTO> getUserId(@PathVariable final Integer userId) {
+    @GetMapping
+    public Mono<GetUserDTO> getUserId(final @PathVariable Integer userId) {
         return this.userFacade.getUserById(userId);
     }
 
-    @GetMapping()
-    public Mono<GetUserDTO> getUser(final @ModelAttribute("user") Mono<GetUserDTO> user) {
-        return user;
-    }
-
     @PutMapping("/update")
-    public Mono<GetUserDTO> updateUser(
-            final @ModelAttribute("user") Mono<GetUserDTO> user,
-            final @RequestBody Mono<UpdateUserPayload> updateUserPayload) {
+    public Mono<GetUserDTO> updateUser(final @PathVariable Integer userId,
+                                       final @RequestBody Mono<UpdateUserPayload> updateUserPayload) {
 
         return updateUserPayload
                 .transform(this.monoValidator::validate)
-                .zipWith(user, (payload, userDTO) -> {
+                .map(payload -> {
                     return new UpdateUserDTO(
-                            userDTO.id(),
+                            userId,
                             payload.name(),
                             payload.surname(),
                             payload.email()
@@ -48,8 +42,8 @@ public final class UserController {
     }
 
     @DeleteMapping("/delete")
-    public Mono<Void> deleteUser(final @ModelAttribute("user") Mono<GetUserDTO> user) {
-      return user.flatMap(userFacade::deleteUser);
+    public Mono<Void> deleteUser(final @PathVariable Integer userId) {
+        return this.userFacade.deleteUser(userId);
     }
 
 }

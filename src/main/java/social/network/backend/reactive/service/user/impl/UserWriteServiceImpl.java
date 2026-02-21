@@ -24,7 +24,12 @@ public final class UserWriteServiceImpl implements UserWriteService {
     @Override
     public Mono<Void> deleteUser(final Integer id) {
         return this.userRepository
-                .deleteById(id);
+                .deleteUserById(id)
+                .flatMap(count -> {
+                    if (count == 0) return Mono.error(new UserNotFoundException(format(USER_NOT_FOUND_MESSAGE, id)));
+
+                    return Mono.empty();
+                });
     }
 
     @Override

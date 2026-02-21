@@ -33,6 +33,12 @@ public final class PostWriteServiceImpl implements PostWriteService {
 
     @Override
     public Mono<Void> deletePost(final Integer postId) {
-        return this.postRepository.deleteById(postId);
+        return this.postRepository
+                .deletePostById(postId)
+                .flatMap(count ->{
+                    if (count == 0) return Mono.error(new RuntimeException("Post not found"));
+
+                    return Mono.empty();
+                });
     }
 }

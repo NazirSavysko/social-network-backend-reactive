@@ -16,8 +16,10 @@ import social.network.backend.reactive.model.Message;
 import social.network.backend.reactive.service.message.MessageReadService;
 import social.network.backend.reactive.service.message.MessageWriteService;
 import social.network.backend.reactive.service.user.UserReadService;
+import social.network.backend.reactive.security.AccessValidator;
 
 import java.time.LocalDateTime;
+
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public final class MessageFacadeImpl implements MessageFacade {
     private final MessageReadService messageReadService;
     private final UserReadService userReadService;
     private final GetUserDTOMapper getUserDTOMapper;
+    private final AccessValidator accessValidator;
 
     @Override
     public Flux<GetMessageDTO> getAllMessagesByUserId(final Integer userId, final Pageable pageable) {
@@ -39,9 +42,9 @@ public final class MessageFacadeImpl implements MessageFacade {
     @Override
     public Mono<GetMessageDTO> createMessage(final Mono<CreateMessageDTO> createMessageMono) {
         return createMessageMono.flatMap(dto ->
-
                 Mono.zip(
-                        this.userReadService.getUserById(dto.senderId()),
+                        this.userReadService.getUserById(dto.senderId())
+                                .flatMap(sender -> this.accessValidator.checkOwnerOrAdmin(sender, sender.getEmail())),
                         this.userReadService.getUserById(dto.receiverId())
                 ).flatMap(tuple -> {
                     val sender = tuple.getT1();
@@ -70,20 +73,26 @@ public final class MessageFacadeImpl implements MessageFacade {
     public Mono<GetMessageDTO> getMessageById(final Integer messageId) {
         return this.messageReadService
                 .getMessageWithDetailsById(messageId)
-                .map(this.getMessageDTOMapper::mapToDTO);
+                .map(this.getMessageDTOMapper::mapToDTO)
+                .flatMap(msg -> this.accessValidator.checkMessageReadAccess(msg, msg.sender().email(), msg.receiver().email()));
     }
 
     @Override
     public Mono<GetMessageDTO> updateMessage(final Mono<UpdateMessageDTO> updateMessage) {
-        return updateMessage
-                .flatMap(updateMessageDTO -> this.messageWriteService
-                        .updateMessage(updateMessageDTO.id(), updateMessageDTO.content())
-                )
-                .map(this.getMessageDTOMapper::mapToDTO);
+        return updateMessage.flatMap(updateMessageDTO ->
+                this.messageReadService.getMessageWithDetailsById(updateMessageDTO.id())
+                        .map(this.getMessageDTOMapper::mapToDTO)
+                        .flatMap(msg -> this.accessValidator.checkOwnerOrAdmin(msg, msg.sender().email()))
+                        .flatMap(msg -> this.messageWriteService.updateMessage(updateMessageDTO.id(), updateMessageDTO.content()))
+                        .map(this.getMessageDTOMapper::mapToDTO)
+        );
     }
 
     @Override
     public Mono<Void> deleteMessage(final Integer messageId) {
-        return this.messageWriteService.deleteMessageById(messageId);
+        return this.messageReadService.getMessageWithDetailsById(messageId)
+                .map(this.getMessageDTOMapper::mapToDTO)
+                .flatMap(msg -> this.accessValidator.checkOwnerOrAdmin(msg, msg.sender().email()))
+                .flatMap(msg -> this.messageWriteService.deleteMessageById(messageId));
     }
 }

@@ -22,7 +22,13 @@ public final class MessageWriteServiceImpl implements MessageWriteService {
 
     @Override
     public Mono<Void> deleteMessageById(final Integer messageId) {
-        return this.messageRepository.deleteById(messageId);
+        return this.messageRepository.deleteSubscriptionById(messageId)
+                .flatMap(count ->{
+                    if (count == 0) return Mono.error(new RuntimeException("Message not found"));
+
+                    return Mono.empty();
+                });
+
     }
 
     @Override

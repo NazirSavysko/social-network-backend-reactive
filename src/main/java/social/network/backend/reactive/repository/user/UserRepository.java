@@ -12,9 +12,16 @@ public interface UserRepository extends ReactiveCrudRepository<User, Integer> {
 
     Mono<User> findByEmail(String email);
 
+
     @Modifying
-    @Query("UPDATE social_user " +
-            "SET name = :name, surname = :surname, email = :email, password = :password " +
-            "WHERE id = :id")
+    @Query("DELETE FROM social_network.social_user WHERE id = :id")
+    Mono<Integer> deleteUserById(Integer id);
+
+    @Modifying
+    @Query(""" 
+            UPDATE social_network.social_user
+                        SET name = :name, surname = :surname, email = :email, password = :password 
+                        WHERE id = :id
+            """)
     Mono<Integer> updateUser(Integer id, String name, String surname, String email, String password);
 }

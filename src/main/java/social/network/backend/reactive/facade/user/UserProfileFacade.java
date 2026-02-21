@@ -10,5 +10,5 @@ public interface UserProfileFacade {
 
     Mono<GetUserDTO> updateUser(Mono<UpdateUserDTO> updateUserDTOMono);
 
-    Mono<Void> deleteUser(GetUserDTO getUserDTO);
+    Mono<Void> deleteUser(Integer userId);
 }

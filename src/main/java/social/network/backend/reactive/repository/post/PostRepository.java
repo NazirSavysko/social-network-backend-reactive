@@ -12,6 +12,10 @@ import java.time.Instant;
 
 public interface PostRepository extends ReactiveCrudRepository<Post, Integer> {
 
+    @Modifying
+    @Query("DELETE FROM social_network.post WHERE id = :id")
+    Mono<Integer> deletePostById(Integer id);
+
     @Query("""
                     SELECT
                         p.id,

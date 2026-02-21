@@ -1,6 +1,6 @@
 package social.network.backend.reactive.controller.admin;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +16,7 @@ import social.network.backend.reactive.facade.admin.AdminFacade;
 
 @RestController
 @RequestMapping("/api/v1/admins/statistics")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public final class AdminController {
 
     private final AdminFacade adminFacade;

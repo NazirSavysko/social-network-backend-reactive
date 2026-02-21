@@ -16,7 +16,6 @@ import java.time.Instant;
 public final class Subscription {
 
     @Id
-
     private Integer id;
 
     private Integer subscriberId;

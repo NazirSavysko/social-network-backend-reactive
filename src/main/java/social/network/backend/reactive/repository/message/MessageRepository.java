@@ -10,6 +10,10 @@ import social.network.backend.reactive.model.projection.MessageWithSenderAndReci
 
 public interface MessageRepository extends ReactiveCrudRepository<Message, Integer> {
 
+    @Modifying
+    @Query("DELETE FROM social_network.subscription WHERE id = :id")
+    Mono<Integer> deleteSubscriptionById(Integer id);
+
     @Query("""
             SELECT
                 m.id AS id,

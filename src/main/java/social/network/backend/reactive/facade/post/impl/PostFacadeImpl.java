@@ -19,10 +19,9 @@ import social.network.backend.reactive.service.image.ImageWriteService;
 import social.network.backend.reactive.service.post.PostReadService;
 import social.network.backend.reactive.service.post.PostWriteService;
 import social.network.backend.reactive.service.user.UserReadService;
+import social.network.backend.reactive.security.AccessValidator;
 
 import java.time.Instant;
-
-
 @Component
 @RequiredArgsConstructor
 public final class PostFacadeImpl implements PostFacade {
@@ -34,6 +33,7 @@ public final class PostFacadeImpl implements PostFacade {
     private final ImageWriteService imageWriteService;
     private final ImageReadService imageReadService;
     private final FileService fileService;
+    private final AccessValidator accessValidator;
 
     @Override
     public Flux<GetPostDTO> getAllPostsByUserId(final Integer userId, final Pageable pageable) {
@@ -47,6 +47,7 @@ public final class PostFacadeImpl implements PostFacade {
         return createPostDTOMono
                 .flatMap(createPostDTO -> userReadService
                         .getUserById(createPostDTO.userId())
+                        .flatMap(user -> this.accessValidator.checkOwnerOrAdmin(user, user.getEmail()))
                         .flatMap(user -> this.saveImage(user.getEmail(), createPostDTO.imageInFormatBase64()))
                         .zipWhen(image -> {
                             val post = Post.builder()
@@ -77,29 +78,34 @@ public final class PostFacadeImpl implements PostFacade {
     @Override
     public Mono<Void> deletePost(final Integer postId) {
         return this.postReadService.getPostById(postId)
+                .flatMap(post -> this.userReadService.getUserById(post.getUserId())
+                        .flatMap(owner -> this.accessValidator.checkOwnerOrAdmin(post, owner.getEmail())))
                 .flatMap(post -> this.postWriteService
                         .deletePost(post.getId())
                         .then(Mono.defer(() -> this.imageReadService.getImageById(post.getImageId())
                                 .flatMap(image -> this.fileService.deleteFile(image.getFilePath())))
                         )
                 );
-
     }
 
     @Override
     public Mono<GetPostDTO> updatePost(final Mono<UpdatePostDTO> updatePostPayload) {
         return updatePostPayload
                 .flatMap(updatePostDTO -> this.postReadService
-                        .getPostWithDetailsById(updatePostDTO.id())
+                        .getPostById(updatePostDTO.id())
+                        .flatMap(post -> this.userReadService.getUserById(post.getUserId())
+                                .flatMap(owner -> this.accessValidator.checkOwnerOrAdmin(post, owner.getEmail())))
                         .flatMap(post -> this.saveImage(updatePostDTO.userEmail(), updatePostDTO.imageInFormatBase64())
                                 .flatMap(savedImage -> this.postWriteService.updatePost(
-                                                post.id(),
+                                                post.getId(),
                                                 updatePostDTO.text(),
                                                 Instant.now(),
                                                 savedImage.getId()
                                         )
-                                ).map(this.dtoMapper::mapToDTO)
+                                )
                         )
+                        .then(this.postReadService.getPostWithDetailsById(updatePostDTO.id()))
+                        .map(this.dtoMapper::mapToDTO)
                 );
     }
 
@@ -112,6 +118,5 @@ public final class PostFacadeImpl implements PostFacade {
 
                     return this.imageWriteService.saveImage(image);
                 });
-
     }
 }
